@@ -4,8 +4,20 @@ const maxLengthInputPrompt = require("inquirer-maxlength-input-prompt");
 const fs = require("fs");
 
 //function to create the SVG file given the user inputs
-function createSVG({text, color, shape}) {
+function createSVG({ text, textColor, color, shape }) {
+    switch(shape) {
+        case "Triangle": 
+            generatedShape = new Triangle(color, text, textColor);
+            break;
+        case "Square":
+            generatedShape = new Square(color, text, textColor);
+            break;
+        case "Circle": 
+            generatedShape = new Circle(color, text, textColor);
+            break;
+    }
     return `<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+${generatedShape.render()}
 </svg>`
 }
 //create a new inquirer prompt that checks the length of the input
@@ -19,6 +31,12 @@ inquirer.prompt ([
         message: "Enter text for your logo (Max of three characters): ",
         name: "text",
         maxLength: 3
+    },
+
+    {
+        type: "input",
+        message: "Enter a color for your text (color keyword or hexadecimal number): ",
+        name: "textColor"
     },
 
     {
@@ -38,5 +56,8 @@ inquirer.prompt ([
 ])
 
 .then((answer) => {
-
+    fs.writeFile('output.svg', createSVG(answer), (err) => {
+        if(err) console.log(err);
+        console.log("SVG created!");
+    })
 })
